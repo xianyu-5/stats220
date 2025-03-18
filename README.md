@@ -11,4 +11,4 @@ This is my repo for **STATS 220**.
 - [[tenor website](https://tenor.com/zh-CN/)]
 
 A meme that captures how I currently feel about my university studies is:  
-![](https://tenor.com/gbN9wEfVbsD.gif)
+![](https://media1.tenor.com/m/RjHa_iHqn5UAAAAd/smug-smile.gif)
