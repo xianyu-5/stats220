@@ -3,7 +3,7 @@ This is my repo for **STATS 220**.
 
 ## A little about me
 1. I am undertaking a **Mathematics and statistics** degree
-2. I am taking *STATS 220* because Course requirements
+2. I am taking **(*STATS 220*)** because Course requirements
 3. I am interested in learning about the use of math in life
 
 
