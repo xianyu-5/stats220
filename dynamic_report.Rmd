@@ -1,0 +1,97 @@
+---
+title: Dynamic Report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+```
+
+```{css}
+body { 
+  font-family: 'Helvetica', sans-serif; 
+  line-height: 1.6;
+}
+h2 { 
+  color: #2C3E50; 
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 8px;
+}
+.dynamic-comment { 
+  color: #16A085; 
+  font-weight: bold;
+}
+```
+
+## Data Loading and Preparation
+
+```{r}
+library(tidyverse)
+csv_url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_TFNS7HNwjwNYpwSQCy20wYWZCyCejXjcR0EKOxUxMurwcZ3oA4gVai60trRxT0Fwh17GbUJWTSN0/pub?output=csv"
+logged_data <- read_csv(csv_url)
+
+# Rename variables using the rename() function to create a new data frame latest_data
+latest_data <- logged_data %>%
+  rename(
+    ad_count = `How many ads/sponsored content are in the first 5 recommendations?`,
+    content_theme = `What are the main themes of these videos?`,
+    video_format = `What is the primary format of these videos?`
+  )
+
+```
+
+## Summary Statistics
+
+```{r}
+final_stats <- latest_data %>%
+  summarise(
+    mean_ads = round(mean(ad_count, na.rm = TRUE), 1),
+    zero_ads = paste0(round(sum(ad_count == 0, na.rm = TRUE) / n() * 100, 1), "%")
+  )
+# Create dynamic comments based on summary values
+mean_ads_text <- paste0("The average number of ads per session is ", final_stats$mean_ads, ".")
+zero_ads_text <- paste0("Sessions with zero ads constitute ", final_stats$zero_ads, " of all observations.")
+
+cat("Average ads per session:", final_stats$mean_ads, "\n")
+cat("Percentage of sessions with zero ads:", final_stats$zero_ads, "\n")
+```
+
+## Visualizations
+
+### 1. Top Content Themes
+
+```{r}
+theme_plot <- latest_data %>%
+  separate_rows(content_theme, sep = ", ") %>%
+  filter(content_theme != "Other") %>%
+  count(content_theme) %>%
+  mutate(content_theme = fct_reorder(content_theme, n)) %>%
+  ggplot(aes(x = n, y = content_theme)) +
+  geom_col(fill = "#4ECDC4", alpha = 0.8) +
+  labs(
+    title = "Top Content Themes in Recommendations",
+    subtitle = "Excluding 'Other' Category",
+    x = "Frequency",
+    y = NULL
+  ) +
+  theme_minimal()
+print(theme_plot)
+
+
+```
+
+### 2. Ad Distribution by Video Format
+
+```{r}
+format_ads_plot <- ggplot(latest_data, aes(x = video_format, y = ad_count)) +
+  geom_boxplot(fill = "#FFD700", outlier.color = "#FF4500") +
+  labs(
+    title = "Ad Distribution by Video Format",
+    x = "Video Format",
+    y = "Number of Ads"
+  ) +
+  coord_flip() +
+  theme_minimal()
+print(format_ads_plot)
+
+```
